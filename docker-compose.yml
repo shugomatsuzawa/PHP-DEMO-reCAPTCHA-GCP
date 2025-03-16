@@ -1,0 +1,16 @@
+services:
+  php:
+    build: ./php
+    volumes:
+      - ./php:/var/www
+    ports:
+      - 80:80
+  mailpit:
+    image: axllent/mailpit:v1.4.0
+    ports:
+      - 127.0.0.1:8025:8025
+    healthcheck:
+      test: [ "CMD", "ping", "-c", "3", "127.0.0.1" ]
+      interval: 1s
+      timeout: 30s
+      retries: 5
