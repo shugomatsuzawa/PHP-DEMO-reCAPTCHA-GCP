@@ -9,7 +9,8 @@ $recaptcha_sitekey = RECAPTCHA_SITEKEY;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>reCAPTCHA Enterprise PHP Sample</title>
+  <meta name="robots" content="noindex">
   <script src="https://www.google.com/recaptcha/enterprise.js?render=<?php print $recaptcha_sitekey ?>"></script>
   <script>
     function onSubmit(token) {

@@ -1,4 +1,6 @@
 <?php
+define("DEBUG", false);
+
 define("RECAPTCHA_SITEKEY", "YOUR_RECAPTCHA_SITEKEY");
 define("RECAPTCHA_PROJECT", "YOUR_RECAPTCHA_PROJECT");
 

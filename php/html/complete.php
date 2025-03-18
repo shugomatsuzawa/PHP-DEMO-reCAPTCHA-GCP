@@ -2,6 +2,8 @@
 require 'vendor/autoload.php';
 require 'config.php';
 
+ini_set('display_errors', DEBUG);
+
 // Composer を使用して Google Cloud の依存関係を組み込む
 // use Google\Cloud\RecaptchaEnterprise\V1\RecaptchaEnterpriseServiceClient;
 use Google\Cloud\RecaptchaEnterprise\V1\Client\RecaptchaEnterpriseServiceClient; // NOTE: Client 付きが正解 https://github.com/googleapis/google-cloud-php-recaptcha-enterprise/blob/main/samples/V1/RecaptchaEnterpriseServiceClient/create_assessment.php
@@ -12,7 +14,7 @@ use Google\Cloud\RecaptchaEnterprise\V1\TokenProperties\InvalidReason;
 use PHPMailer\PHPMailer\PHPMailer;
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-  header('Location: /');
+  header('Location: ' . $_SERVER['HTTP_REFERER']);
   exit;
 }
 
@@ -27,7 +29,7 @@ $comment = htmlspecialchars($_POST['comment'] ?? '');
 
 // 入力チェック
 if (empty($name) || empty($email) || empty($subject) || empty($comment)) {
-  header('Location: /');
+  header('Location: ' . $_SERVER['HTTP_REFERER']);
   exit;
 }
 
@@ -43,10 +45,18 @@ if ($recaptcha_result['status'] === 'success') {
   if ($recaptcha_result['score'] >= 0.5) {
     // 合格（評価あり スコア 0.5 以上）
     $mail_result = send_mail($name, $email, $subject, $comment);
-    $result = [
-      'status' => 'success',
-      'score' => $recaptcha_result['score']
-    ];
+    if ($mail_result['status'] === 'success') {
+      $result = [
+        'status' => 'success',
+        'score' => $recaptcha_result['score']
+      ];
+    } else {
+      $result = [
+        'status' => 'error',
+        'message' => $mail_result['message'],
+        'score' => $recaptcha_result['score']
+      ];
+    }
   } else {
     // 失格（評価あり スコア 0.5 未満）
     $result = [
@@ -173,14 +183,15 @@ function send_mail($name, $email, $subject, $comment): array
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>reCAPTCHA Enterprise PHP Sample</title>
+  <meta name="robots" content="noindex">
 </head>
 
 <body>
   <h1><?php print $result['status'] === 'success' ? 'Successfully sent email' : 'Failure to send email' ?></h1>
   <?php isset($result['message']) ? print "<p>{$result['message']}</p>" : '' ?>
   <?php isset($result['score']) ? print "<p>The score for the protection action is: {$result['score']}</p>" : '' ?>
-  <a href="/">Back</a>
+  <a href="../">Back</a>
 </body>
 
 </html>
