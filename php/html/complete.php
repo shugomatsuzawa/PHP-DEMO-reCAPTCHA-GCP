@@ -191,7 +191,7 @@ function send_mail($name, $email, $subject, $comment): array
   <h1><?php print $result['status'] === 'success' ? 'Successfully sent email' : 'Failure to send email' ?></h1>
   <?php isset($result['message']) ? print "<p>{$result['message']}</p>" : '' ?>
   <?php isset($result['score']) ? print "<p>The score for the protection action is: {$result['score']}</p>" : '' ?>
-  <a href="../">Back</a>
+  <a href="<?php $_SERVER['HTTP_REFERER'] ?>">Back</a>
 </body>
 
 </html>
